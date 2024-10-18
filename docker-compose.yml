@@ -1,0 +1,17 @@
+services:
+  discovery:
+    build: ./discovery
+    restart: unless-stopped
+    environment:
+      MONGO_URL: mongodb://root:example@mongo:27017 # MongoDB connection string
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017" # Optional: Expose MongoDB port if you need external access

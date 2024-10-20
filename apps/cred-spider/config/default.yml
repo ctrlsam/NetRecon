@@ -1,0 +1,89 @@
+grabber:
+  ignore_url_regex:
+    - "https?://www\\.googletagmanager\\.com"
+    - "https?://www\\.google-analytics\\.com"
+    - "https?://fonts\\.googleapis\\.com"
+    - "https?://.*\\.googleapis\\.com"
+    - "https?://.*\\.cloudflare\\.com"
+    - "https?://.*\\.bootstrapcdn\\.com"
+    - "https?://.*.jsdelivr.net"
+
+    - "bootstrap|jquery|popper|lodash"
+
+evaluator:
+  patterns:
+    - name: AWS_ACCESS_KEY
+      regex: "((?:ASIA|AKIA|AROA|AIDA)[A-Z0-7]{16})"
+      confidence: high
+      
+    - name: SQUARE_KEY
+      regex: "sqOatp-[0-9A-Za-z-_]{22}"
+      confidence: high
+
+    - name: Slack Token
+      regex: "(xox[pborsa]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-z0-9]{32})"
+      confidence: high
+
+    - name: AWS API Key
+      regex: "AKIA[0-9A-Z]{16}"
+      confidence: high
+      
+    - name: Amazon MWS Auth Token
+      regex: "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+      confidence: high
+
+    - name: AWS AppSync GraphQL Key
+      regex: "da2-[a-z0-9]{26}"
+      confidence: high
+
+    - name: Twilio API Key
+      regex: "SK[0-9a-fA-F]{32}"
+      confidence: high
+
+    # - name: Google Drive API Key
+    #   regex: "AIza[0-9A-Za-z\\-_]{35}"
+    #   confidence: high
+
+    - name: Stripe API Key
+      regex: "sk_live_[0-9a-zA-Z]{24}"
+      confidence: high
+
+    - name: Stripe Restricted API Key
+      regex: "rk_live_[0-9a-zA-Z]{24}"
+      confidence: high
+
+    - name: Mailgun API Key
+      regex: "key-[0-9a-zA-Z]{32}"
+      confidence: high
+
+    - name: Password in URL
+      regex: "[a-zA-Z]{3,10}://[^/\\s:@]{3,20}:[^/\\s:@]{3,20}@.{1,100}[\"'\\s]"
+      confidence: high
+
+    - name: OpenAI API Key
+      regex: "sk-[0-9a-zA-Z]{48}"
+      confidence: high
+
+    - name: Bitcoin Private Key
+      regex: "^[0-9a-fA-F]{64}$"
+      confidence: high
+
+    - name: Ethereum Private Key
+      regex: "^0x[0-9a-fA-F]{64}$"
+      confidence: high
+
+    - name: Bitcoin WIF Key
+      regex: "^[5KL][1-9A-HJ-NP-Za-km-z]{50,51}$"
+      confidence: high
+
+    - name: BIP39 Mnemonic Phrase
+      regex: "^(\\w+ ){11,23}\\w+$"
+      confidence: high
+
+    - name: XRP (Ripple) Key
+      regex: "^r[1-9A-HJ-NP-Za-km-z]{32,33}$"
+      confidence: high
+
+    - name: DigitalOcean API Key
+      regex: "dop_v1_[0-9a-fA-F]{64}"
+      confidence: high

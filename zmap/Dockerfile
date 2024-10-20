@@ -1,4 +1,6 @@
+# ==============================================
 # Stage 1: Build ZMap and ZTee from source
+# ==============================================
 FROM ubuntu:24.04 as builder
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -34,7 +36,9 @@ RUN mkdir -p /opt/zmap \
     && cmake --build . --parallel "$(nproc)" \
     && cmake --install . --prefix "/opt/zmap"
 
+# ===========================================================
 # Stage 2: Create the final image with runtime dependencies
+# ===========================================================
 FROM ubuntu:24.04
 
 LABEL org.opencontainers.image.source="https://github.com/zmap/zmap"

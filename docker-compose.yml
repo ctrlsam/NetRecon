@@ -1,17 +1,75 @@
+version: '3.8'
+
 services:
-  discovery:
-    build: ./discovery
-    restart: unless-stopped
+  zmap:
+    build: ./zmap
+    restart: "no"
+    network_mode: "host"
     environment:
-      MONGO_URL: mongodb://root:example@mongo:27017 # MongoDB connection string
+      MONGO_URL: mongodb://localhost:27017
+      RABBITMQ_URL: amqp://localhost:5672
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  zgrab:
+    build: ./zgrab
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      MONGO_URL: mongodb://localhost:27017
+      RABBITMQ_URL: amqp://localhost:5672
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  ui:
+    build: ./ui
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      PUBLIC_API_URL: http://localhost:1234
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      MONGO_URL: mongodb://localhost:27017
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   mongo:
     image: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
     ports:
-      - "27017:27017" # Optional: Expose MongoDB port if you need external access
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

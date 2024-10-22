@@ -1,0 +1,32 @@
+[project]
+name = "common"
+version = "0.0.1"
+description = "Common code for the Rigour project"
+readme = "README.md"
+classifiers = [
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = "~=3.11"
+dependencies = [
+    "pymongo",
+    "loguru",
+    "pika",
+    "dacite",
+    "pydantic"
+]
+
+[project.optional-dependencies]
+dev = [
+
+]
+
+[tool.setuptools.packages.find]
+include = ["common*"]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"

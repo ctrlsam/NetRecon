@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/public';
+import type { Count, Host } from './types';
 
 export const base = `${env.PUBLIC_API_URL}/api/v1`;
 
@@ -43,3 +44,35 @@ export function post(path: string, data: object) {
 export function put(path: string, data: object) {
 	return send({ method: 'PUT', path, data });
 }
+
+
+//
+//
+//
+
+export const getHost = async (ip: string) => {
+	const host = await get(`host/${ip}`);
+	return host as Host;
+};
+
+export const getHosts = async (query?: string, skip?: number, limit?: number) => {
+	const params = new URLSearchParams();
+
+	if (query !== undefined) params.append('query', query);
+	if (skip !== undefined) params.append('skip', skip.toString());
+	if (limit !== undefined) params.append('limit', limit.toString());
+
+	const hosts = await get(`host/search?${params.toString()}`);
+	return hosts as Host[];
+  };
+
+
+export const getCounts = async (query?: string, facet?: string) => {
+	const params = new URLSearchParams();
+
+	if (query !== undefined) params.append('query', query);
+	if (facet !== undefined) params.append('facet', facet);
+
+	const counts = await get(`host/count?${params.toString()}`);
+	return counts as Count;
+  };

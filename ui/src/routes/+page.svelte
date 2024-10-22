@@ -4,11 +4,12 @@
     import HostItem from '$lib/components/HostItem.svelte';
 
     export let data: PageData;
+    console.log(data)
 </script>
 
 <div class="flex">
     <div class="w-1/4 h-screen border-r">
-        <HostSidebar hosts={data} />
+        <HostSidebar counts={data.counts} />
     </div>
     <div class="w-full">
         {#each data.hosts as host}

@@ -13,7 +13,6 @@
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a href="/" data-sveltekit-reload>Hosts</a>
-				<a href="/credentials" data-sveltekit-reload>Credentials</a>
 				<a href="/admin" data-sveltekit-reload>Admin</a>
 			</svelte:fragment>
 		</AppBar>

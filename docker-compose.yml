@@ -1,57 +1,86 @@
-version: '3.8'
-
 services:
-  zmap:
-    build: ./zmap
-    restart: "no"
-    network_mode: "host"
-    environment:
-      MONGO_URL: mongodb://localhost:27017
-      RABBITMQ_URL: amqp://localhost:5672
-    depends_on:
-      mongo:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-
-  zgrab:
-    build: ./zgrab
+  port-scanner:
+    build:
+      context: .
+      dockerfile: rigour/ports/Dockerfile
     restart: unless-stopped
     network_mode: "host"
     environment:
-      MONGO_URL: mongodb://localhost:27017
-      RABBITMQ_URL: amqp://localhost:5672
+      PORTS: "80,443,22,25565"
     depends_on:
-      mongo:
-        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
-  ui:
-    build: ./ui
+  banner-scanner-http-80:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
     restart: unless-stopped
     network_mode: "host"
     environment:
-      PUBLIC_API_URL: http://localhost:1234
+      SERVICE: http
+      PORT: 80
     depends_on:
-      mongo:
+      rabbitmq:
         condition: service_healthy
+
+  banner-scanner-http-443:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: http
+      PORT: 443
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  banner-scanner-ssh-22:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: ssh
+      PORT: 22
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  addon-minecraft-scanner:
+    build:
+      context: .
+      dockerfile: rigour/addons/minecraft/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  vuln-scanner:
+    build:
+      context: .
+      dockerfile: rigour/vuln/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    depends_on:
       rabbitmq:
         condition: service_healthy
 
   api:
-    build: ./api
+    build:
+      context: .
+      dockerfile: rigour/api/Dockerfile
     restart: unless-stopped
     network_mode: "host"
-    environment:
-      MONGO_URL: mongodb://localhost:27017
     depends_on:
-      mongo:
-        condition: service_healthy
       rabbitmq:
         condition: service_healthy
 
-  mongo:
+  mongodb:
     image: mongo
     restart: always
     ports:

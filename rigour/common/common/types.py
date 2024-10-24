@@ -10,6 +10,7 @@ class Vulnerability:
     title: str
     version: str
     link: str
+    # TODO: This should be linked to the service and port
 
 
 @dataclass
@@ -25,7 +26,7 @@ class Location:
 @dataclass
 class Banner:
     service: str
-    port: int
+    port: int | None
     data: dict
 
 
@@ -52,5 +53,5 @@ class DBHost(BaseModel):
     first_seen: datetime.datetime
 
     class Config:
-        orm_mode = True  # Allows compatibility with ORM objects
+        from_attributes = True  # Allows compatibility with ORM objects
         extra = "ignore"  # Ignores extra fields not defined in the model

@@ -16,7 +16,9 @@ dependencies = [
     "loguru",
     "pika",
     "dacite",
-    "pydantic"
+    "pydantic",
+    "aiormq",
+    "msgpack"
 ]
 
 [project.optional-dependencies]

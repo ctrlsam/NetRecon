@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     network_mode: "host"
     environment:
-      PORTS: "80,443,22,25565"
+      PORTS: "80,443,22,21,25565,27017,143,6379"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -46,6 +46,71 @@ services:
     environment:
       SERVICE: ssh
       PORT: 22
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  banner-scanner-ftp-21:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: ftp
+      PORT: 21
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  banner-scanner-imap-143:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: imap
+      PORT: 143
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  banner-scanner-redis-6379:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: redis
+      PORT: 6379
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  banner-scanner-mongodb-27017:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: mongodb
+      PORT: 27017
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  banner-scanner-jarm-443:
+    build:
+      context: .
+      dockerfile: rigour/banners/Dockerfile
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      SERVICE: jarm
+      PORT: 443
     depends_on:
       rabbitmq:
         condition: service_healthy

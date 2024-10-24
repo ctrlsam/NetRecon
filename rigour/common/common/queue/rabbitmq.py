@@ -7,10 +7,8 @@ from common.config import Config
 from common.utils import DateTimeEncoder
 from loguru import logger
 
-from . import QueueManagerInterface
 
-
-class RabbitMQQueueManager(QueueManagerInterface):
+class RabbitMQQueueManager:
     def __init__(self, uri: str | None = None, exchange="data_exchange"):
         self.uri = uri or Config.get_rabbitmq_uri()
         self.exchange = exchange

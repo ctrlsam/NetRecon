@@ -1,8 +1,9 @@
+import asyncio
 from dataclasses import asdict
 
 from common import utils
 from common.database.mongodb import Database
-from common.queue.rabbitmq import RabbitMQQueueManager
+from common.queue.rabbitmq_asyncio import AsyncRabbitMQQueueManager
 from common.types import Banner, HostMessage
 from dacite import from_dict
 from loguru import logger
@@ -12,14 +13,14 @@ from mcstatus import JavaServer, status_response
 class MinecraftBannerGrabber:
     def __init__(self, port: int = 25565):
         self.db = Database()
-        self.queue = RabbitMQQueueManager()
+        self.queue = AsyncRabbitMQQueueManager()
         self.port = port
 
-    def listen(self):
+    async def listen(self):
         routing_key = f"#.{self.port}.#.port"
-        self.queue.consume(routing_key=routing_key, callback=self.process_port)
+        await self.queue.consume(routing_key=routing_key, callback=self.process_port)
 
-    def process_port(self, port_message: dict) -> None:
+    async def process_port(self, port_message: dict) -> None:
         logger.debug(f"Received RabbitMQ message: {port_message}")
         message = from_dict(data_class=HostMessage, data=port_message)
 
@@ -34,7 +35,7 @@ class MinecraftBannerGrabber:
         )
 
         route_key = utils.route_key_from_host_message(message, "banner")
-        self.queue.publish(route_key, asdict(message))
+        await self.queue.publish(route_key, asdict(message))
         utils.save_banner(self.db, message)
 
     def get_mc_banner(
@@ -43,7 +44,7 @@ class MinecraftBannerGrabber:
         try:
             server = JavaServer(ip, port)
             status = server.status()
-        except:  # noqa: E722
+        except:
             logger.debug(f"Failed to get status of: {ip}:{port}")
         else:
             return status
@@ -51,4 +52,6 @@ class MinecraftBannerGrabber:
 
 if __name__ == "__main__":
     grabber = MinecraftBannerGrabber()
-    grabber.listen()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(grabber.listen())
+    loop.run_forever()

@@ -1,9 +1,10 @@
+import asyncio
 import re
 from dataclasses import asdict
 
 from common import utils
 from common.database.mongodb import Database
-from common.queue.rabbitmq import RabbitMQQueueManager
+from common.queue.rabbitmq_asyncio import AsyncRabbitMQQueueManager
 from common.types import HostMessage
 from dacite import from_dict
 from loguru import logger
@@ -13,16 +14,16 @@ from vuln_detector import VulnerabilityDetector
 class VulnScanner:
     def __init__(self) -> None:
         self.db = Database()
-        self.queue = RabbitMQQueueManager()
+        self.queue = AsyncRabbitMQQueueManager()
         self.detector = VulnerabilityDetector()
         self.software_version_pattern = re.compile(r"(\w+)[/ ]([\d.]+)")
 
-    def listen(self) -> None:
+    async def listen(self) -> None:
         # {country}.{port}.{ip}.banner
         routing_key = "#.#.#.banner"
-        self.queue.consume(routing_key=routing_key, callback=self.process_banners)
+        await self.queue.consume(routing_key=routing_key, callback=self.process_banners)
 
-    def process_banners(self, port_message: dict) -> None:
+    async def process_banners(self, port_message: dict) -> None:
         logger.debug(f"Received RabbitMQ message: {port_message}")
         message = from_dict(data_class=HostMessage, data=port_message)
 
@@ -48,7 +49,7 @@ class VulnScanner:
 
         message.host.vulnerabilities = vulnerabilities
 
-        self.publish(message)
+        await self.publish(message)
         utils.save_vulnerability(self.db, message)
 
     def get_server_header(self, message: HostMessage) -> str | None:
@@ -66,10 +67,12 @@ class VulnScanner:
             return None
         return match.groups()  # type: ignore
 
-    def publish(self, message: HostMessage) -> None:
+    async def publish(self, message: HostMessage) -> None:
         route_key = utils.route_key_from_host_message(message, "vuln")
-        self.queue.publish(route_key, asdict(message))
+        await self.queue.publish(route_key, asdict(message))
 
 
 if __name__ == "__main__":
-    VulnScanner().listen()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(VulnScanner().listen())
+    loop.run_forever()

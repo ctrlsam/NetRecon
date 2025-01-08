@@ -9,6 +9,7 @@ from common import utils
 from common.database.mongodb import Database
 from common.queue.rabbitmq_asyncio import AsyncRabbitMQQueueManager
 from common.types import Host, HostMessage, Location
+from common.config import Config
 from loguru import logger
 from zmap import ZMap, ZMapCommand, ZMapResult
 
@@ -46,8 +47,9 @@ def main():
     db = Database()
     queue = AsyncRabbitMQQueueManager()
     reader = geoip2.database.Reader("geolite2-city.mmdb")
-    ports = os.getenv("PORTS", "80")
-
+    ports = Config.get_ports()
+    networks = Config.get_networks()
+    
     logger.info(f"Starting port scanner for port/s: {ports}")
 
     async def callback(result: ZMapResult) -> None:
@@ -60,7 +62,7 @@ def main():
         await queue.publish(route_key, asdict(host))
         save(db, host)
 
-    command = ZMapCommand(ports)
+    command = ZMapCommand(ports,networks)
     zmap = ZMap(command)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(zmap.run(callback))

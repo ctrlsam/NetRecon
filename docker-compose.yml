@@ -7,6 +7,7 @@ services:
     network_mode: "host"
     environment:
       PORTS: "80,443,22,21,25565,27017,143,6379"
+      NETWORKS: "10.0.0.0/8 192.168.0.0/16"
     depends_on:
       rabbitmq:
         condition: service_healthy

@@ -15,5 +15,13 @@ class Config:
         return os.environ.get("RABBITMQ_URL", default)
 
     @staticmethod
+    def get_networks(default: str = "10.0.0.0/8") -> str:
+        return os.environ.get("NETWORKS", default)
+
+    @staticmethod
+    def get_ports(default: str = "80") -> str:
+        return os.environ.get("PORTS", default)
+
+    @staticmethod
     def get_scan_collection() -> str:
         return "scans"

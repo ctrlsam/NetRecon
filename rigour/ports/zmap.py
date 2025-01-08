@@ -4,8 +4,9 @@ from common.subprocess import AsyncSubprocessBase
 
 
 class ZMapCommand:
-    def __init__(self, ports: str):
+    def __init__(self, ports: str, networks: str):
         self.ports = ports
+        self.networks = networks
 
     def build(self):
         return [
@@ -16,6 +17,7 @@ class ZMapCommand:
             "--quiet",  # Suppress status updates
             "--rate=200",  # Send 100 packets per second
             '--output-filter="success = 1"',  # Filter successful results
+            self.networks
         ]
 
 

@@ -17,7 +17,7 @@ class ZMapCommand:
             "--quiet",  # Suppress status updates
             "--rate=200",  # Send 100 packets per second
             '--output-filter="success = 1"',  # Filter successful results
-            self.networks
+            self.networks,
         ]
 
 
